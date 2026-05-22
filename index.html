@@ -3,163 +3,899 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyRun - JetBrains 激活工具</title>
+    <title>KeyRun - JetBrains 工具</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #f7f8f5;
+            --paper: #ffffff;
+            --ink: #17191c;
+            --muted: #70777f;
+            --line: #e6e9df;
+            --green: #5da963;
+            --green-dark: #43804a;
+            --shadow: 0 18px 46px rgba(42, 50, 38, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            margin: 0;
             min-height: 100vh;
-            color: #e4e4e4;
-            padding: 2rem;
+            background:
+                radial-gradient(circle at top left, rgba(93, 169, 99, 0.13), transparent 32rem),
+                linear-gradient(180deg, #fbfcf9 0%, var(--bg) 48%, #eef2eb 100%);
+            color: var(--ink);
+            font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
         }
-        .container {
-            max-width: 900px;
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .page {
+            width: min(1180px, calc(100% - 48px));
             margin: 0 auto;
+            padding: 28px 0 44px;
         }
-        h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, #00d9ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-            margin-bottom: 0.5rem;
+
+        .top-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
         }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 2rem;
+
+        .repo-link {
+            color: var(--green-dark);
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid #cfd6cc;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.82);
+            padding: 7px 11px;
         }
-        .card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            backdrop-filter: blur(10px);
+
+        .repo-link:hover {
+            color: #2f6335;
+            border-color: #9fbea0;
         }
-        .card h2 {
-            color: #00d9ff;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+
+        .lang select {
+            height: 34px;
+            border: 1px solid #cfd6cc;
+            border-radius: 4px;
+            background: #fff;
+            color: #333;
+            padding: 0 34px 0 10px;
         }
-        .cmd-box {
-            background: #0d1117;
-            border: 1px solid #30363d;
+
+        .topbar {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid rgba(226, 230, 219, 0.88);
             border-radius: 8px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.86);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 16px;
+            z-index: 10;
+        }
+
+        .search-wrap {
             position: relative;
         }
-        .cmd-box code {
-            color: #00ff88;
-        }
-        .copy-btn {
+
+        .search-wrap::before {
+            content: "";
             position: absolute;
-            right: 10px;
-            top: 10px;
-            background: #238636;
-            color: white;
-            border: none;
-            padding: 5px 12px;
+            left: 17px;
+            top: 50%;
+            width: 15px;
+            height: 15px;
+            border: 2px solid #7d858d;
+            border-radius: 50%;
+            transform: translateY(-58%);
+        }
+
+        .search-wrap::after {
+            content: "";
+            position: absolute;
+            left: 30px;
+            top: 28px;
+            width: 8px;
+            height: 2px;
+            border-radius: 999px;
+            background: #7d858d;
+            transform: rotate(45deg);
+        }
+
+        .search {
+            width: 100%;
+            height: 46px;
+            border: 2px solid #2b2f33;
             border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
+            background: #fff;
+            color: var(--ink);
+            outline: none;
+            padding: 0 16px 0 48px;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
         }
-        .copy-btn:hover { background: #2ea043; }
-        .os-label {
+
+        .search:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 4px rgba(93, 169, 99, 0.16);
+        }
+
+        .guide-btn,
+        .copy-btn,
+        .tab-btn {
+            border: 0;
+            border-radius: 6px;
+            min-height: 42px;
+            padding: 0 16px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+        }
+
+        .guide-btn,
+        .copy-btn {
+            background: var(--green);
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(93, 169, 99, 0.26);
+        }
+
+        .guide-btn:hover,
+        .copy-btn:hover {
+            background: var(--green-dark);
+            transform: translateY(-1px);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 28px;
+            align-items: center;
+            padding: 34px 0 28px;
+        }
+
+        .brand-row {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 18px;
+            align-items: center;
+        }
+
+        .brand-mark {
+            width: 58px;
+            height: 58px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .brand-mark span {
+            border-radius: 4px;
+            background: #030405;
+        }
+
+        .brand-mark span:nth-child(4) {
+            background: linear-gradient(135deg, #f25a3d 0%, #e936a7 45%, #3d7dff 100%);
+            border-radius: 50%;
+        }
+
+        h1 {
+            margin: 0;
+            max-width: 720px;
+            font-size: clamp(30px, 4vw, 48px);
+            line-height: 1.08;
+            letter-spacing: 0;
+        }
+
+        h1 span {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-bottom: 0.8rem;
         }
-        .windows { background: #0078d4; }
-        .linux { background: #dd4814; }
-        .mac { background: #555; }
-        .warning {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid #ffc107;
+
+        .hero p {
+            max-width: 620px;
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 1.75;
+        }
+
+        .status-panel {
+            border: 1px solid var(--line);
             border-radius: 8px;
-            padding: 1rem;
-            margin-top: 2rem;
-            color: #ffc107;
+            background: rgba(255, 255, 255, 0.84);
+            padding: 18px;
+            box-shadow: 0 16px 38px rgba(35, 42, 32, 0.1);
         }
-        .warning h3 { margin-bottom: 0.5rem; }
-        footer {
+
+        .status-panel h2 {
+            margin: 0 0 14px;
+            font-size: 16px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .stat {
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fbfcfa;
+            padding: 12px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 22px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: end;
+            margin: 8px 0 18px;
+        }
+
+        .section-head h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .section-head p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .quick-commands {
+            margin: 0 0 34px;
+            padding: 22px;
+            border: 1px solid rgba(229, 232, 224, 0.95);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.84);
+            box-shadow: 0 18px 44px rgba(38, 44, 35, 0.09);
+        }
+
+        .quick-commands h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .quick-commands > p {
+            margin: 8px 0 18px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .command-card {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fbfcfa;
+            padding: 14px;
+        }
+
+        .command-card h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+
+        .quick-commands .command {
+            grid-template-columns: 1fr;
+        }
+
+        .quick-commands .command code {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            line-height: 1.55;
+        }
+
+        .quick-commands .copy-btn {
+            width: 100%;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 28px;
+        }
+
+        .product {
+            min-height: 238px;
+            border: 1px solid rgba(229, 232, 224, 0.95);
+            border-radius: 8px;
+            background: var(--paper);
+            box-shadow: 0 18px 44px rgba(38, 44, 35, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-top {
+            height: 72px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            padding: 18px 24px 12px;
+        }
+
+        .product-icon {
+            width: 56px;
+            height: 56px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .product-body {
+            padding: 24px;
+        }
+
+        .product h3 {
+            margin: 0 0 20px;
+            font-size: 30px;
+            line-height: 1.1;
+            letter-spacing: 0;
+        }
+
+        .stars {
+            color: #a0a7ae;
+            letter-spacing: 2px;
+            font-size: 12px;
+        }
+
+        .product-foot {
+            padding: 0 24px 22px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .empty {
+            display: none;
+            border: 1px dashed #c8d1c5;
+            border-radius: 8px;
+            padding: 32px;
             text-align: center;
-            margin-top: 3rem;
-            color: #666;
-            font-size: 0.9rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.68);
         }
-        a { color: #00d9ff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 74px 20px 30px;
+            background: rgba(20, 24, 21, 0.48);
+            z-index: 40;
+        }
+
+        .overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            width: min(760px, 100%);
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 26px 90px rgba(0, 0, 0, 0.28);
+            overflow: hidden;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: center;
+            padding: 22px 24px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .modal-head h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .close {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fff;
+            color: #333;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px 24px 0;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: #eef2ec;
+            color: #435043;
+        }
+
+        .tab-btn.active {
+            background: var(--ink);
+            color: #fff;
+        }
+
+        .panel {
+            display: none;
+            padding: 22px 24px 26px;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .panel p {
+            margin: 0 0 14px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .command {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid #dce2d9;
+            border-radius: 8px;
+            background: #101417;
+            padding: 12px;
+        }
+
+        .command code {
+            color: #8df09d;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 4px 2px;
+            font-size: 14px;
+        }
+
+        .notes {
+            display: grid;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .note {
+            border-left: 4px solid var(--green);
+            background: #f5f8f2;
+            padding: 12px 14px;
+            color: #4d5a50;
+            line-height: 1.65;
+        }
+
+        footer {
+            margin-top: 42px;
+            padding-top: 24px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--green-dark);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        @media (max-width: 920px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 30px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .command-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                width: min(100% - 28px, 1180px);
+                padding-top: 14px;
+            }
+
+            .top-line {
+                align-items: stretch;
+                flex-direction: column-reverse;
+                gap: 10px;
+            }
+
+            .lang {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .repo-link {
+                text-align: center;
+            }
+
+            .topbar,
+            .command {
+                grid-template-columns: 1fr;
+            }
+
+            .guide-btn,
+            .copy-btn {
+                width: 100%;
+            }
+
+            .hero {
+                padding: 26px 0 24px;
+            }
+
+            .brand-row {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .status-panel {
+                display: none;
+            }
+
+            .section-head {
+                display: block;
+            }
+
+            .section-head p {
+                margin-top: 8px;
+            }
+
+            .quick-commands {
+                padding: 16px;
+                margin-bottom: 26px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .product {
+                min-height: 210px;
+            }
+
+            .product h3 {
+                font-size: 27px;
+            }
+
+            .overlay {
+                padding: 20px 12px;
+                align-items: center;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔑 KeyRun</h1>
-        <p class="subtitle">JetBrains 全家桶激活工具 - 学习研究用途</p>
-
-        <div class="card">
-            <h2>📋 使用方法</h2>
-            
-            <div style="margin-bottom: 1.5rem;">
-                <span class="os-label windows">Windows</span>
-                <p style="margin-bottom: 0.5rem; color: #aaa;">使用 Win + X，选择 PowerShell (管理员) 运行：</p>
-                <div class="cmd-box">
-                    <button class="copy-btn" onclick="copyCmd(this)">复制</button>
-                    <code>irm https://liyangxu1.github.io/keyrun/ps1 | iex</code>
-                </div>
+    <div class="page">
+        <div class="top-line">
+            <a class="repo-link" href="https://github.com/liyangxu1/keyrun">GitHub 仓库</a>
+            <div class="lang">
+                <select aria-label="语言">
+                    <option selected>简体中文</option>
+                </select>
             </div>
+        </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <span class="os-label linux">Linux</span>
-                <p style="margin-bottom: 0.5rem; color: #aaa;">打开终端执行：</p>
-                <div class="cmd-box">
-                    <button class="copy-btn" onclick="copyCmd(this)">复制</button>
-                    <code>curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash</code>
-                </div>
+        <header class="topbar">
+            <div class="search-wrap">
+                <input class="search" id="search" type="search" placeholder="搜索 IDE 或者产品" autocomplete="off">
             </div>
+            <button class="guide-btn" id="openGuide" type="button">激活指南</button>
+        </header>
 
+        <section class="hero" aria-labelledby="title">
             <div>
-                <span class="os-label mac">macOS</span>
-                <p style="margin-bottom: 0.5rem; color: #aaa;">打开终端执行：</p>
-                <div class="cmd-box">
-                    <button class="copy-btn" onclick="copyCmd(this)">复制</button>
-                    <code>curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash</code>
+                <div class="brand-row">
+                    <div class="brand-mark" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <h1 id="title"><span>KeyRun JetBrains</span> <span>工具入口</span></h1>
                 </div>
+                <p>提供 Windows、macOS、Linux 三个平台的静态脚本入口，并集中展示当前仓库内维护的 JetBrains 产品文件。使用前请确认你拥有合法授权或测试许可。</p>
             </div>
-        </div>
+            <aside class="status-panel" aria-label="项目状态">
+                <h2>当前静态入口</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <strong>3</strong>
+                        <span>平台</span>
+                    </div>
+                    <div class="stat">
+                        <strong>12</strong>
+                        <span>产品</span>
+                    </div>
+                    <div class="stat">
+                        <strong>1</strong>
+                        <span>页面</span>
+                    </div>
+                </div>
+            </aside>
+        </section>
 
-        <div class="card">
-            <h2>✅ 支持产品</h2>
-            <p style="color: #aaa; line-height: 1.8;">
-                IntelliJ IDEA、CLion、PhpStorm、GoLand、PyCharm、WebStorm、
-                Rider、DataGrip、RubyMine、AppCode、DataSpell、RustRover 等
-            </p>
-        </div>
+        <section class="quick-commands" aria-labelledby="commandsTitle">
+            <h2 id="commandsTitle">快速命令</h2>
+            <p>关闭正在运行的 JetBrains IDE 后，按你的系统复制对应命令执行。</p>
+            <div class="command-grid">
+                <article class="command-card">
+                    <h3>Windows</h3>
+                    <div class="command">
+                        <code>irm https://liyangxu1.github.io/keyrun/ps1 | iex</code>
+                        <button class="copy-btn" type="button" data-copy="irm https://liyangxu1.github.io/keyrun/ps1 | iex">复制命令</button>
+                    </div>
+                </article>
+                <article class="command-card">
+                    <h3>Linux</h3>
+                    <div class="command">
+                        <code>curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash</code>
+                        <button class="copy-btn" type="button" data-copy="curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash">复制命令</button>
+                    </div>
+                </article>
+                <article class="command-card">
+                    <h3>macOS</h3>
+                    <div class="command">
+                        <code>curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash</code>
+                        <button class="copy-btn" type="button" data-copy="curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash">复制命令</button>
+                    </div>
+                </article>
+            </div>
+        </section>
 
-        <div class="warning">
-            <h3>⚠️ 免责声明</h3>
-            <p>本工具仅供学习和研究使用。请支持正版软件，商业用途请购买官方许可证。</p>
-        </div>
+        <section aria-labelledby="productsTitle">
+            <div class="section-head">
+                <div>
+                    <h2 id="productsTitle">All JetBrains Product</h2>
+                    <p>输入产品名称可以快速过滤列表。</p>
+                </div>
+                <p id="countText">已展示 12 个产品</p>
+            </div>
+
+            <div class="grid" id="productGrid">
+                <article class="product" data-name="IntelliJ IDEA idea ii">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/intellij-idea/intellij-idea.svg" alt="IntelliJ IDEA 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>IntelliJ IDEA</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/idea.key</div>
+                </article>
+                <article class="product" data-name="PyCharm pycharm pc">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/pycharm/pycharm.svg" alt="PyCharm 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>PyCharm</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/pycharm.key</div>
+                </article>
+                <article class="product" data-name="PhpStorm phpstorm ps">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/phpstorm/phpstorm.svg" alt="PhpStorm 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>PhpStorm</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/phpstorm.key</div>
+                </article>
+                <article class="product" data-name="GoLand goland go">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/goland/goland.svg" alt="GoLand 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>GoLand</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/goland.key</div>
+                </article>
+                <article class="product" data-name="Rider rider rd">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/rider/rider.svg" alt="Rider 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>Rider</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/rider.key</div>
+                </article>
+                <article class="product" data-name="CLion clion cl">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/clion/clion.svg" alt="CLion 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>CLion</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/clion.key</div>
+                </article>
+                <article class="product" data-name="RustRover rustrover rr">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/rustrover/rustrover.svg" alt="RustRover 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>RustRover</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/rustrover.key</div>
+                </article>
+                <article class="product" data-name="WebStorm webstorm ws">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/webstorm/webstorm.svg" alt="WebStorm 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>WebStorm</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/webstorm.key</div>
+                </article>
+                <article class="product" data-name="RubyMine rubymine rm">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/rubymine/rubymine.svg" alt="RubyMine 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>RubyMine</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/rubymine.key</div>
+                </article>
+                <article class="product" data-name="DataGrip datagrip db">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/datagrip/datagrip.svg" alt="DataGrip 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>DataGrip</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/datagrip.key</div>
+                </article>
+                <article class="product" data-name="DataSpell dataspell ds">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/dataspell/dataspell.svg" alt="DataSpell 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>DataSpell</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/dataspell.key</div>
+                </article>
+                <article class="product" data-name="AppCode appcode ac">
+                    <div class="product-top"><img class="product-icon" src="https://resources.jetbrains.com/storage/logos/web/appcode/appcode.svg" alt="AppCode 图标" loading="lazy"></div>
+                    <div class="product-body"><h3>AppCode</h3><div class="stars">**********</div></div>
+                    <div class="product-foot">licenses/appcode.key</div>
+                </article>
+            </div>
+
+            <div class="empty" id="emptyState">没有匹配的产品。</div>
+        </section>
 
         <footer>
-            <p>Powered by <a href="https://github.com/liyangxu1/keyrun">GitHub</a> | 基于 ja-netfilter</p>
+            <span>Powered by KeyRun.</span>
         </footer>
     </div>
 
+    <div class="overlay" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+        <div class="modal">
+            <div class="modal-head">
+                <h2 id="guideTitle">激活指南</h2>
+                <button class="close" id="closeGuide" type="button" aria-label="关闭">×</button>
+            </div>
+            <div class="tabs" role="tablist" aria-label="平台">
+                <button class="tab-btn active" type="button" data-tab="windows">Windows</button>
+                <button class="tab-btn" type="button" data-tab="linux">Linux</button>
+                <button class="tab-btn" type="button" data-tab="mac">macOS</button>
+                <button class="tab-btn" type="button" data-tab="help">帮助</button>
+            </div>
+            <div class="panel active" data-panel="windows">
+                <p>使用 Win + X 打开 PowerShell 管理员窗口，执行下方命令。</p>
+                <div class="command">
+                    <code>irm https://liyangxu1.github.io/keyrun/ps1 | iex</code>
+                    <button class="copy-btn" type="button" data-copy="irm https://liyangxu1.github.io/keyrun/ps1 | iex">复制命令</button>
+                </div>
+            </div>
+            <div class="panel" data-panel="linux">
+                <p>打开终端，确认已安装 curl 和 jq 后执行下方命令。</p>
+                <div class="command">
+                    <code>curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash</code>
+                    <button class="copy-btn" type="button" data-copy="curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash">复制命令</button>
+                </div>
+            </div>
+            <div class="panel" data-panel="mac">
+                <p>打开终端执行下方命令。脚本会在缺少依赖时尝试使用 Homebrew 处理。</p>
+                <div class="command">
+                    <code>curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash</code>
+                    <button class="copy-btn" type="button" data-copy="curl -fsSL https://liyangxu1.github.io/keyrun/scripts/install.sh | bash">复制命令</button>
+                </div>
+            </div>
+            <div class="panel" data-panel="help">
+                <div class="notes">
+                    <div class="note">执行脚本前请关闭正在运行的 JetBrains IDE，避免配置文件被占用。</div>
+                    <div class="note">脚本会修改本机 IDE 的 .vmoptions 和用户目录中的配置文件，建议先在可回滚环境中测试。</div>
+                    <div class="note">本页面只展示当前仓库实际存在的脚本入口；没有加入未实现的调试、取消或离线下载路由。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function copyCmd(btn) {
-            const code = btn.parentElement.querySelector('code').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                btn.textContent = '已复制!';
-                setTimeout(() => btn.textContent = '复制', 2000);
+        const search = document.getElementById("search");
+        const cards = Array.from(document.querySelectorAll(".product"));
+        const countText = document.getElementById("countText");
+        const emptyState = document.getElementById("emptyState");
+        const modal = document.getElementById("guideModal");
+        const openGuide = document.getElementById("openGuide");
+        const closeGuide = document.getElementById("closeGuide");
+        const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
+        const panels = Array.from(document.querySelectorAll(".panel"));
+
+        function setCount(count) {
+            countText.textContent = `已展示 ${count} 个产品`;
+            emptyState.style.display = count === 0 ? "block" : "none";
+        }
+
+        function filterProducts() {
+            const keyword = search.value.trim().toLowerCase();
+            let visible = 0;
+
+            cards.forEach((card) => {
+                const matched = card.dataset.name.toLowerCase().includes(keyword);
+                card.style.display = matched ? "flex" : "none";
+                if (matched) visible += 1;
+            });
+
+            setCount(visible);
+        }
+
+        function openModal() {
+            modal.classList.add("open");
+            closeGuide.focus();
+        }
+
+        function closeModal() {
+            modal.classList.remove("open");
+            openGuide.focus();
+        }
+
+        function switchTab(name) {
+            tabButtons.forEach((button) => {
+                button.classList.toggle("active", button.dataset.tab === name);
+            });
+            panels.forEach((panel) => {
+                panel.classList.toggle("active", panel.dataset.panel === name);
             });
         }
+
+        async function copyText(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+                const oldText = button.textContent;
+                button.textContent = "已复制";
+                window.setTimeout(() => {
+                    button.textContent = oldText;
+                }, 1600);
+            } catch (error) {
+                const input = document.createElement("textarea");
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand("copy");
+                document.body.removeChild(input);
+                button.textContent = "已复制";
+            }
+        }
+
+        search.addEventListener("input", filterProducts);
+        openGuide.addEventListener("click", openModal);
+        closeGuide.addEventListener("click", closeModal);
+        modal.addEventListener("click", (event) => {
+            if (event.target === modal) closeModal();
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && modal.classList.contains("open")) closeModal();
+        });
+        tabButtons.forEach((button) => {
+            button.addEventListener("click", () => switchTab(button.dataset.tab));
+        });
+        document.querySelectorAll("[data-copy]").forEach((button) => {
+            button.addEventListener("click", () => copyText(button.dataset.copy, button));
+        });
+        setCount(cards.length);
     </script>
 </body>
 </html>
