@@ -846,7 +846,7 @@ function Main
     $user_path = [Environment]::GetEnvironmentVariable("USERPROFILE")
     $public_path = [Environment]::GetEnvironmentVariable("PUBLIC")
     # GitHub Pages 静态托管地址
-    $script:url_base = "https://liyangxu1.github.io/keyrun"
+    $script:url_base = "https://jetbrains-activate.mwzbl.qzz.io"
     $script:url_download = "$script:url_base/ja-netfilter"
     # 静态托管使用预生成的 License 文件
     $script:url_license = "$script:url_base/licenses"
@@ -907,10 +907,10 @@ function Main
     $author = [char]0x9152 + [char]0x6C8F + [char]0x8336  # 酒沏茶
     Write-Host "`n========================================" -ForegroundColor Cyan
     Write-Host "  Powered by $author | KeyRun" -ForegroundColor Green
-    Write-Host "  https://liyangxu1.github.io/keyrun" -ForegroundColor DarkGray
+    Write-Host "  https://jetbrains-activate.mwzbl.qzz.io" -ForegroundColor DarkGray
     Write-Host "========================================`n" -ForegroundColor Cyan
     Start-Sleep -s 2
-    Start-Process "https://liyangxu1.github.io/keyrun"
+    Start-Process "https://jetbrains-activate.mwzbl.qzz.io"
     $null = Read-Host
 }
 
