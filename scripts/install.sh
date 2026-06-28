@@ -426,7 +426,7 @@ DEBUG=false
 ENABLE_COLOR=true
 
 # GitHub Pages 静态托管地址
-URL_BASE="https://liyangxu1.github.io/keyrun"
+URL_BASE="https://jetbrains-activate.mwzbl.qzz.io"
 URL_DOWNLOAD="${URL_BASE}/ja-netfilter"
 # 静态托管使用预生成的 License 文件
 URL_LICENSE="${URL_BASE}/licenses"
@@ -1143,7 +1143,7 @@ main() {
     echo ""
     echo -e "\033[0;36m========================================\033[0m"
     echo -e "\033[0;32m  Powered by 酒沏茶 | KeyRun\033[0m"
-    echo -e "\033[38;5;240m  https://liyangxu1.github.io/keyrun\033[0m"
+    echo -e "\033[38;5;240m  https://jetbrains-activate.mwzbl.qzz.io\033[0m"
     echo -e "\033[0;36m========================================\033[0m"
     echo ""
     sleep 1
